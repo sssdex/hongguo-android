@@ -1,3 +1,17 @@
+# 0.7.31-dm23 / versionCode 73123（2026-11-21，dist 分支首次分发构建）
+
+相对 `feature/danmaku` 只改了分发相关配置（包名、应用名、图标、更新源），**弹幕实现逐字未改**；逐项差异见 `DISTRIBUTION.md` 与 `THIRD_PARTY_NOTICES.md`。
+
+- 构建：`gradle :app:assembleDebug -PappDanmakuBuild=23` → BUILD SUCCESSFUL（4m 19s）。APK 26,479,013 字节，SHA-256 `c820b9af9e67aba27338238fb4c5d273b9d9007d3ffc11505fe562e002066f6f`。
+- 签名：证书 SHA-256 `a230559be2d904fcc0e3ccefe68730156e84a45a2f7f9603999efe3283a56f55`（本机 `~/.android/debug.keystore`）。与 `release-signing.sha256` 记录的 `d06122bd…` 不同，因此与上游包**不能互相覆盖安装**，只能并存或卸载重装。
+- 静态核对：package `com.hongguo.android.dm`、versionName `0.7.31-dm23`、versionCode `73123`、minSdk 26、application-label `弹幕剧场`；`apkanalyzer dex packages` 可查到 `com.hongguo.android.danmaku.*`（classes3.dex 61 处引用、classes8.dex 7 处）。
+- 432 项 JVM 测试通过，0 失败、0 错误、0 跳过。Android Lint 0 错误、39 警告、1 提示（警告项与上游基线一致，未新增）。
+- 模拟器 AVD `hg36`（Pixel 6 轮廓，Android 16，x86_64，1080×2400，无头 + `screencap`）：`adb install -r` 成功；安装后 `pm list packages` 同时列出 `com.hongguo.android` 与本包，验证包名分离的并存设计。
+- 业务验收（真实上游接口、未登录）：首页正常出内容；页头为「弹幕剧场」+ 自绘气泡标记；播放页右下有自绘「弹」气泡开关与设置入口；《装穷提亲》第 1 集 00:12 起出现多条滚动弹幕（「这一包金条拿着真轻松😂」「全网最高赞！♡467.65万」等）；设置面板为等分候选条、不压暗画面；「我的」底部显示「弹幕剧场 0.7.31-dm23」；未配置更新源时点「检查更新」，展开「查看原因」得到「本构建未配置更新源，请从发布页手动获取新版本。」
+- 弹幕暂停冻结（间隔 5s 两张截图逐像素一致）、开关、字号/屏幕占比即时生效、杀进程 + 换剧后参数沿用，均在 `0.7.31-dm22` 构建上逐项验证过；本次 dm23 只改分发配置，未逐项重跑。
+- 未验证：真机、横竖屏切换、画中画与弹幕层的叠放关系、账号登录全流程。另：本次观察到同一剧集中评论量差异很大（《落魄老头》第 1 集全程无弹幕，《装穷提亲》密集），弹幕为空不等于功能故障，确认时请换一部热度高的剧。
+- 重跑注意：Windows 上若写了 `local.properties`，lint 会对盘符转义报 `PropertyEscape`（该文件本就不入库）；改用 `ANDROID_HOME` 环境变量即可。lint 结果有缓存，改动后需清 `app/build/intermediates/*lint*` 再跑。
+
 # 0.7.31 / versionCode 42（2026-11-20）
 
 首次播放和切集若遇到间歇性 HTTP 200 空正文，会在同一会话重查一次。针对读取播放信息的 GET 请求，单次请求和整集请求的剩余时间共同限制断线重试。客户端收到明确的退避要求后停止本次请求。
