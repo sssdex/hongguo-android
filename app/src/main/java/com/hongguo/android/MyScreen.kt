@@ -131,7 +131,7 @@ internal fun MyScreen(state: HongguoUiState, model: HongguoViewModel,
         item {
             Text("本机收藏与观看记录仅保存在这台设备。", color = Muted, fontSize = 12.sp, lineHeight = 20.sp,
                 modifier = Modifier.padding(top = 8.dp))
-            Text("红果独立版 ${BuildConfig.VERSION_NAME}", color = Muted, fontSize = 12.sp,
+            Text("弹幕剧场 ${BuildConfig.VERSION_NAME}", color = Muted, fontSize = 12.sp,
                 modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 24.dp))
         }
     }
@@ -477,7 +477,7 @@ private fun ImmersiveMine(state: HongguoUiState, model: HongguoViewModel, update
         }
         item { MyServiceMenu("主题、播放与更新", state.themeStyle.label, updateState, updateModel, onAccount, openSettings) }
         item {
-            Text("红果独立版 ${BuildConfig.VERSION_NAME} · 本机数据仅保存在这台设备", color = Muted, fontSize = 12.sp,
+            Text("弹幕剧场 ${BuildConfig.VERSION_NAME} · 本机数据仅保存在这台设备", color = Muted, fontSize = 12.sp,
                 textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp))
         }
     }

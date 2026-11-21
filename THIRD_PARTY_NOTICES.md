@@ -176,3 +176,16 @@ Playback v5 model endpoint (2026-11-16)
 - 本项目与本上游同为 GPL-3.0-only，移植后不再附加额外限制；原作者的著作权与来源注释保留在各文件头部。
 
 改动：请求仍走同一条评论列表接口，但签名与匿名安装 ID 改用本应用自己的 `api.playback.Signer` 和 `VendorConstants`，与播放请求同源；参数由原来的滑杆与行数档位改为「开关 + 屏幕占比 / 字体大小 / 不透明度 / 文字效果 / 移动速度」候选按钮，屏占比按整屏高度定高、行数由字号和屏高换算；转屏时屏幕上已有的弹幕按已滚比例重新锚定续播；弹幕字号以 dp 为基准，不随系统字号设置放大；新增自绘的弹幕开关与设置图标。未复制对方的 APK、应用图标或任何美术素材。
+
+## 本仓库（dist 分支）的修改声明
+
+2026-11-21：本仓库在上游 `OOIUa/hongguo-android` 与 `heyvye/hongguo-android` 分支 `feature/danmaku` 的基础上，做了**与弹幕算法无关**的分发相关修改，并按 GPL-3.0 §5 在此标记：
+
+- `app/build.gradle.kts`：`applicationId` 改为 `com.hongguo.android.dm`（可用 `-PforkApplicationId` 覆盖）；在线更新源改为由 `-PupdateRepository` 注入，默认不绑定。
+- `app/src/main/java/com/hongguo/android/UpdateViewModel.kt`：未配置更新源时直接返回说明，不再探测上游清单。
+- `app/src/main/AndroidManifest.xml` 与 `MyScreen.kt`、`MainActivity.kt`：应用名改为「弹幕剧场」。
+- `app/src/main/res/drawable/ic_logo.xml`、`ic_launcher_foreground.xml`、`ic_launcher_background.xml`、`ic_launcher_monochrome.xml`：替换为自绘的「对话气泡 + 播放键」矢量，**未使用任何上游图标素材**。
+- `README.md`、`DISTRIBUTION.md`、`VALIDATION.md`：补充分发说明与验证记录。
+
+`namespace`、包内类名与接口协议均未改动。除上述内容外，弹幕实现与上游分支逐字一致。
+

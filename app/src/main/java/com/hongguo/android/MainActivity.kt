@@ -259,9 +259,9 @@ private fun ComponentActivity.storedThemePalette(): HongguoPalette {
 private fun BrandHeader() {
     Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        // Minimal red-fruit brand mark, shared with the launcher icon (res/drawable/ic_logo.xml, vector).
+        // 中性标记（对话气泡 + 播放键），与启动图标同源（res/drawable/ic_logo.xml, vector）。
         Image(painterResource(R.drawable.ic_logo), contentDescription = null, modifier = Modifier.size(34.dp))
-        Text("红果剧场", fontSize = 23.sp, fontWeight = FontWeight.Bold, color = Ink)
+        Text("弹幕剧场", fontSize = 23.sp, fontWeight = FontWeight.Bold, color = Ink)
     }
 }
 

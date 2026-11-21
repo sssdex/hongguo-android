@@ -1,47 +1,68 @@
+> [!IMPORTANT]
+> **本仓库是第三方修改分支（带弹幕），不是官方版。**
+>
+> 在上游 [`OOIUa/hongguo-android`](https://github.com/OOIUa/hongguo-android) 的 GPL-3.0 源码上，合入了 [`heyvye` 分支 `feature/danmaku`](https://github.com/heyvye/hongguo-android/tree/feature/danmaku)（上游 PR #10）的弹幕功能，并做了去商标化与独立分发配置：
+>
+> - 应用名「弹幕剧场」· 包名 `com.hongguo.android.dm` · **可与上游版并存**
+> - 签名与上游不同，**不能与上游版互相覆盖安装**
+> - 与红果 / 抖音 / 番茄小说及其关联公司无关，未获授权，不代表其立场；接口靠逆向官方客户端工作，官方改版即可能失效
+> - 分发合规、签名、发布步骤与风险清单见 [DISTRIBUTION.md](DISTRIBUTION.md)
+
 <div align="center">
 
-<img src="docs/images/logo.png" width="112" alt="红果独立版 logo">
+# 弹幕剧场
 
-# 红果独立版
+**带弹幕的短剧客户端（第三方修改分支）**
 
-**在手机上发现好剧，随时接着看。**
+Kotlin + Jetpack Compose + Media3 的原生 Android 客户端，请求、媒体处理、缓存与播放均在本机完成。<br>本分支在上游基础上合入了弹幕：可调屏幕占比 / 字号 / 不透明度 / 文字效果 / 滚动速度，暂停即停、倍速同步。
 
-基于 Kotlin、Jetpack Compose 与 Media3 构建的原生 Android 短剧客户端。<br>请求、媒体处理、缓存与播放均在本机完成，无需部署服务器或配置 API key。
+[![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)](#下载与安装) [![License](https://img.shields.io/badge/License-GPL--3.0--only-blue)](LICENSE) [![弹幕](https://img.shields.io/badge/%E5%BC%B9%E5%B9%95-PR%20%2310-F15A2B)](DISTRIBUTION.md)
 
-[![Release](https://img.shields.io/github/v/release/OOIUa/hongguo-android?label=Release&color=F15A2B)](https://github.com/OOIUa/hongguo-android/releases/latest) [![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)](#下载与安装) [![UI](https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4)](#功能一览) [![License](https://img.shields.io/badge/License-GPL--3.0--only-blue)](LICENSE)
-
-[**下载 APK**](https://github.com/OOIUa/hongguo-android/releases/latest) · [iPhone 版](https://github.com/OOIUa/hongguo-ios) · [界面预览](#界面预览) · [使用说明](#快速上手) · [源码构建](#源码构建) · [反馈问题](https://github.com/OOIUa/hongguo-android/issues)
+[**下载 APK**](../../releases/latest) · [分发说明](DISTRIBUTION.md) · [源码构建](#源码构建) · [上游项目](https://github.com/OOIUa/hongguo-android)
 
 </div>
 
 ## 下载与安装
 
-当前发布版本：**v0.7.31**（versionCode 42）· Android **8.0 / API 26** 及以上。
+从本仓库的 [Releases](../../releases/latest) 下载最新 APK。Android **8.0 / API 26** 及以上。
 
-| 下载方式 | 链接 |
-| --- | --- |
-| GitHub 直连 | [下载 v0.7.31 APK](https://github.com/OOIUa/hongguo-android/releases/download/v0.7.31/hongguo-android-0.7.31.apk) |
-| 加速线路 1 | [通过 gh-proxy.com 下载](https://gh-proxy.com/https://github.com/OOIUa/hongguo-android/releases/download/v0.7.31/hongguo-android-0.7.31.apk) |
-| 加速线路 2 | [通过 ghfast.top 下载](https://ghfast.top/https://github.com/OOIUa/hongguo-android/releases/download/v0.7.31/hongguo-android-0.7.31.apk) |
-| 发布说明与源码 | [全部版本](https://github.com/OOIUa/hongguo-android/releases) · [v0.7.31 完整源码](https://github.com/OOIUa/hongguo-android/releases/download/v0.7.31/hongguo-android-0.7.31-source.zip) · [SHA-256 校验文件](https://github.com/OOIUa/hongguo-android/releases/download/v0.7.31/SHA256SUMS-0.7.31.txt) |
+每个 Release 的说明都写明：对应的源码 tag、APK 的 SHA-256、包名与签名指纹。下载后可以这样核对：
 
-下载后打开 APK，按 Android 系统提示完成安装。GitHub 连接不畅时可尝试加速线路，公共代理的可用性取决于网络与服务状态。
+```bash
+sha256sum <下载到的文件>.apk
+```
 
-> **已有旧版？请直接覆盖安装，保留收藏、历史与续播位置。** 同签名版本可覆盖升级；卸载或清除应用数据会删除本机记录。0.1 / 0.2 版本需先手动覆盖安装一次新版，0.3.0 起支持应用内更新，0.4.0 起支持加速线路。
+> **与上游版的关系**：本包的包名（`com.hongguo.android.dm`）和签名都与上游版不同。
+>
+> - 可以和上游版**同时安装**；
+> - **不能**覆盖安装到上游版上，也不能让上游版覆盖本包（会报 `INSTALL_FAILED_UPDATE_INCOMPATIBLE`）；
+> - 本分支内部升级：签名不变时可以覆盖安装，保留收藏、历史与续播位置；
+> - 卸载或清除应用数据会删除本机记录，属于有损操作，不能当作无损升级。
 
-### iPhone 版
-
-iOS 客户端独立托管在 [OOIUa/hongguo-ios](https://github.com/OOIUa/hongguo-ios)，基于 SwiftUI 与 AVFoundation 原生实现，支持 iOS 17.0 及以上。发布的是**无签名 IPA**，需用自己的签名工具签名后安装。
-
-| 获取方式 | 链接 |
-| --- | --- |
-| 下载 IPA | [iOS 最新版本](https://github.com/OOIUa/hongguo-ios/releases/latest) |
-| 全能签软件源（官方） | `https://raw.githubusercontent.com/OOIUa/hongguo-ios/main/distribution/source.json` |
-| 全能签软件源（加速） | `https://gh-proxy.com/https://raw.githubusercontent.com/OOIUa/hongguo-ios/main/distribution/source-cn.json` |
-
-更多线路与安装说明见 [iOS 版 README](https://github.com/OOIUa/hongguo-ios#下载与安装)，iOS 问题请到 [hongguo-ios Issues](https://github.com/OOIUa/hongguo-ios/issues) 反馈。
+> 上游本体客户端与 iOS 版见 [OOIUa/hongguo-android](https://github.com/OOIUa/hongguo-android) 与 [OOIUa/hongguo-ios](https://github.com/OOIUa/hongguo-ios)。
 
 ## 界面预览
+
+> 以下截图取自上游文档，界面与功能与本分支一致，但截图里的应用名与图标仍是上游品牌，本分支已改为「弹幕剧场」与自绘标记。
+
+### 本分支实机截图
+
+模拟器 AVD `hg36`（Pixel 6 轮廓，Android 16，1080×2400）实测，`0.7.31-dm23`：
+
+<table>
+  <tr>
+    <th align="center">首页（弹幕剧场）</th>
+    <th align="center">播放页 · 弹幕滚动</th>
+    <th align="center">弹幕设置面板</th>
+  </tr>
+  <tr>
+    <td><img src="docs/images/fork/home.png" width="220" alt="首页：页头为「弹幕剧场」，自绘气泡图标"></td>
+    <td><img src="docs/images/fork/danmaku.png" width="220" alt="播放页：多条弹幕滚动，右下角为「弹」开关与设置入口"></td>
+    <td><img src="docs/images/fork/danmaku-settings.png" width="220" alt="弹幕设置面板：屏幕占比、字号、不透明度、文字效果、移动速度五档候选条，右下角恢复默认"></td>
+  </tr>
+</table>
+
+弹幕参数：屏幕占比 5 档（1/6 … 全屏）、字号 5 档、不透明度 4 档、文字效果（白字 / 黑边 / 阴影）、移动速度 5 档；跟随播放位置滚动，暂停即停、倍速同步；换集/换剧/重启后沿用；画中画不显示；弹幕层在手势层之下，不影响单击显隐、双击暂停与横滑。
 
 <table>
   <tr>

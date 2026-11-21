@@ -21,17 +21,27 @@ val appVersionCode = providers.gradleProperty("appVersionCode").orElse(
     }
 ).get().toInt()
 
+// 本分支（dist/*）用独立的应用 ID 与中性名称分发，见 DISTRIBUTION.md。
+// 在线更新源默认不绑定：为空时应用内更新检查会提示"本构建未配置更新源"，
+// 避免误指向上游 OOIUa/hongguo-android 而提示一个签名不符、装不上的新版。
+// 发布时用 -PupdateRepository=<owner>/<repo> 指定本仓库，并把同版本的
+// update.json 上传到该仓库的 Release。
+val forkApplicationId = providers.gradleProperty("forkApplicationId").orElse("com.hongguo.android.dm").get()
+val updateRepository = providers.gradleProperty("updateRepository").orElse("").get()
+val updateManifestUrl = if (updateRepository.isBlank()) "" else
+    "https://github.com/$updateRepository/releases/latest/download/update.json"
+
 android {
     namespace = "com.hongguo.android"
     compileSdk = 36
     defaultConfig {
-        applicationId = "com.hongguo.android"
+        applicationId = forkApplicationId
         minSdk = 26
         targetSdk = 36
         versionCode = appVersionCode
         versionName = appVersionName
-        buildConfigField("String", "UPDATE_REPOSITORY", "\"OOIUa/hongguo-android\"")
-        buildConfigField("String", "UPDATE_MANIFEST_URL", "\"https://github.com/OOIUa/hongguo-android/releases/latest/download/update.json\"")
+        buildConfigField("String", "UPDATE_REPOSITORY", "\"$updateRepository\"")
+        buildConfigField("String", "UPDATE_MANIFEST_URL", "\"$updateManifestUrl\"")
         testInstrumentationRunner = "com.hongguo.android.HongguoTestRunner"
     }
     buildTypes {

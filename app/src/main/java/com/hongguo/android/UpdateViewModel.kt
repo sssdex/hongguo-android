@@ -45,6 +45,11 @@ class UpdateViewModel internal constructor(
         application,
         application.getSharedPreferences("app_updates", 0),
         { source, onSource ->
+            // dist 分支可以不绑定更新源：这时直接给出说明，不去探测上游清单，
+            // 否则会提示一个签名不符、装不上的新版。
+            require(BuildConfig.UPDATE_MANIFEST_URL.isNotBlank()) {
+                "本构建未配置更新源，请从发布页手动获取新版本。"
+            }
             UpdateRepository().check(BuildConfig.UPDATE_MANIFEST_URL, BuildConfig.UPDATE_REPOSITORY, source, onSource)
         },
     )
