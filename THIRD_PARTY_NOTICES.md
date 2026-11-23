@@ -192,15 +192,15 @@ Playback v5 model endpoint (2026-11-16)
 
 ## 内置字体（dist 分支新增）
 
-本分支额外打包了两套中文字体，只用于弹幕渲染，字形均未修改：
+弹幕设置里的「黑体 / 宋体 / 楷体 / 鸿蒙」四档都随 APK 打包字体文件（只用于弹幕渲染）：
 
-- **思源黑体 / Source Han Sans SC Regular**（`app/src/main/assets/fonts/SourceHanSansSC-Regular.otf`）
-  - 来源：adobe-fonts/source-han-sans，Release `2.005R` 的 `09_SourceHanSansSC.zip` 内 `OTF/SimplifiedChinese/SourceHanSansSC-Regular.otf`。
-    https://github.com/adobe-fonts/source-han-sans
-  - 许可：SIL Open Font License 1.1，全文见 `app/src/main/assets/licenses/SourceHanSans-OFL.txt`。
-- **HarmonyOS Sans SC Regular**（`app/src/main/assets/fonts/HarmonyOS_Sans_SC_Regular.ttf`）
-  - 来源：Huawei Device Co., Ltd. 发布的 HarmonyOS Sans 字体；本仓库使用的是镜像 iota9star/fonts Release 中的同名文件。
-    https://github.com/iota9star/fonts/releases
-  - 许可：HarmonyOS Sans Fonts License Agreement（允许随软件捆绑、再分发未修改副本，要求显著声明使用）。全文见 `app/src/main/assets/licenses/HarmonyOS-Sans-LICENSE.txt`。
+| 档位 | 文件 | 来源 | 许可与处理 |
+| --- | --- | --- | --- |
+| 黑体（默认） | `fonts/SourceHanSansSC-Regular.otf` | adobe-fonts/source-han-sans Release `2.005R`，`09_SourceHanSansSC.zip` 内 `OTF/SimplifiedChinese/SourceHanSansSC-Regular.otf` | SIL OFL 1.1（`licenses/SourceHanSans-OFL.txt`）。按 GB2312 + 常用标点做过子集，字形未改。 |
+| 宋体 | `fonts/SourceHanSerifSC-Regular.otf` | adobe-fonts/source-han-serif Release `2.003R`，`09_SourceHanSerifSC.zip` 内 `OTF/SimplifiedChinese/SourceHanSerifSC-Regular.otf` | SIL OFL 1.1（`licenses/SourceHanSerif-OFL.txt`）。同样子集化，字形未改。 |
+| 楷体 | `fonts/LXGWWenKai-Regular.ttf` | lxgw/LxgwWenKai Release `v1.530` 的 `LXGWWenKai-Regular.ttf` | SIL OFL 1.1（`licenses/LXGWWenKai-OFL.txt`）。该字体声明了保留字体名（Reserved Font Name「LXGW」「霞鹜」等），子集属于修改版，因此内部族名改为 **Tanmu Kai**，字形未改。 |
+| 鸿蒙 | `fonts/HarmonyOS_Sans_SC_Regular.ttf` | Huawei Device Co., Ltd. 的 HarmonyOS Sans；镜像 iota9star/fonts Release 同名文件 | HarmonyOS Sans Fonts License Agreement（`licenses/HarmonyOS-Sans-LICENSE.txt`）：允许随软件捆绑与再分发**未修改**副本，因此保留完整原文件、未做子集。 |
 
-弹幕的「B站」档即思源黑体。B站官方客户端在 Android 上用系统黑体渲染弹幕，本应用内置思源黑体是为了在各机型上得到一致的现代黑体观感，**没有使用 B站 的任何字体文件或美术素材**。
+弹幕的默认档「黑体」即思源黑体。B站官方客户端在 Android 上用系统黑体渲染弹幕，本应用内置思源黑体是为了在各机型上得到一致的现代黑体观感，**没有使用 B站 的任何字体文件或美术素材**。
+
+> 为什么不再提供「系统」档、也不再直接写系统字体族名（serif / monospace）：实测 Android 会把中文回退到同一个系统黑体，用户体感就是「换字体没变化」，所以四档全部内置字体文件。

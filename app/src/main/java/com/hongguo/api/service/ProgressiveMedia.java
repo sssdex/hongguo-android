@@ -52,7 +52,16 @@ public final class ProgressiveMedia {
     private static final Pattern CONTENT_RANGE = Pattern.compile("bytes ([0-9]+)-([0-9]+)/([0-9]+)");
     private static final Pattern REPR_DIGEST = Pattern.compile("(sha-256|sha-512)=:([A-Za-z0-9+/]+={0,2}):");
     // Documented redirects from the model's media CDN. These receive only ordinary Range requests.
-    private static final String[] REDIRECT_DOMAINS = {"vegslb.com", "idouyinvod.com", "smtcdns.com"};
+    // 媒体 CDN 的 302 会落到各种字节系边缘域名。原先只放行三个，实测播放到 1~2 分钟时
+    // 偶尔收到一个不在表里的跳转域名就可能直接「视频播放失败」。这里补上常见的边缘/对象存储后缀，
+    // 仍然只接受 https、无 userinfo、无 fragment 的地址。
+    private static final String[] REDIRECT_DOMAINS = {
+            // 实测 2026-11-23：播放到 1~2 分钟或换集准备时，CDN 会 302 到
+            // <随机串>.bdcgslb.com，原白名单不含它，于是直接 TerminalFailure「不受支持的媒体地址」。
+            "bdcgslb.com",
+            "vegslb.com", "idouyinvod.com", "smtcdns.com",
+            "bytecdntp.com", "ibytedtos.com", "bytetos.com",
+            "pstatp.com", "volccdn.com", "volcvideo.com", "douyinvod.com"};
     private static final Object CACHE_GUARD = new Object();
     private static final LinkedHashMap<Path, CacheBlock> CACHE = new LinkedHashMap<>(16, .75f, true);
     private static final Set<Path> LIVE_DIRS = new HashSet<>();
@@ -590,6 +599,8 @@ public final class ProgressiveMedia {
                     try { AppSource.checkedUrl(uri.toString(), REDIRECT_DOMAINS); return uri; }
                     catch (Exception ignored) { }
                 }
+                // 仅调试用：只记域名与是否跳转，不记完整地址（含签名参数）。
+                android.util.Log.w("MediaHost", "rejected host=" + uri.getHost() + " redirect=" + redirect);
             }
         }
         throw new TerminalFailure("不受支持的媒体地址");

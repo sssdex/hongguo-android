@@ -6,9 +6,9 @@ plugins {
 
 // 版本号规则：主版本号跟随上游发布（0.7.33），后缀 -dmN 是本仓库自己的改动序号，
 // 只随自己的改动累加，不受主版本升降影响；上游再升级时把 appBaseVersion 改过去、
-// 序号接着往下数即可（下一版 0.7.34-dm25）。versionCode 由主版本折算再加序号，保证越装越大。
+// 序号接着往下数即可（下一版 0.7.34-dm26）。versionCode 由主版本折算再加序号，保证越装越大。
 val appBaseVersion = providers.gradleProperty("appBaseVersion").orElse("0.7.33").get()
-val appDanmakuBuild = providers.gradleProperty("appDanmakuBuild").orElse("24").get().toInt()
+val appDanmakuBuild = providers.gradleProperty("appDanmakuBuild").orElse("25").get().toInt()
 val appVersionName = providers.gradleProperty("appVersionName").orElse("$appBaseVersion-dm$appDanmakuBuild").get()
 val appVersionCode = providers.gradleProperty("appVersionCode").orElse(
     run {
@@ -16,7 +16,7 @@ val appVersionCode = providers.gradleProperty("appVersionCode").orElse(
         val major = parts.getOrNull(0)?.toIntOrNull() ?: 0
         val minor = parts.getOrNull(1)?.toIntOrNull() ?: 0
         val patch = parts.getOrNull(2)?.toIntOrNull() ?: 0
-        // 0.7.30-dm1 → 70000 + 3000 + 1 = 73001；0.7.33-dm24 → 70000 + 3300 + 24 = 73324。
+        // 0.7.30-dm1 → 70000 + 3000 + 1 = 73001；0.7.33-dm25 → 70000 + 3300 + 25 = 73325。
         (major * 1_000_000 + minor * 10_000 + patch * 100 + appDanmakuBuild).toString()
     }
 ).get().toInt()

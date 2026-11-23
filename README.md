@@ -15,7 +15,7 @@
 
 **带弹幕的短剧客户端（第三方修改分支）**
 
-Kotlin + Jetpack Compose + Media3 的原生 Android 客户端，请求、媒体处理、缓存与播放均在本机完成。<br>本分支在上游官方弹幕之上补了**字体切换**：内置思源黑体（默认，B站弹幕观感）与 HarmonyOS Sans，另有系统 / 宋体 / 等宽可选；屏幕占比、字号、不透明度、文字效果、滚动速度均可调，暂停即停、倍速同步。
+Kotlin + Jetpack Compose + Media3 的原生 Android 客户端，请求、媒体处理、缓存与播放均在本机完成。<br>本分支在上游官方弹幕之上补了**字体切换**：内置思源黑体（默认，B站弹幕观感）、思源宋体、霞鹜文楷与 HarmonyOS Sans 四套字体，四档两两可辨；屏幕占比、字号、不透明度、文字效果、滚动速度均可调，暂停即停、倍速同步。
 
 [![Android](https://img.shields.io/badge/Android-8.0%2B-3DDC84?logo=android&logoColor=white)](#下载与安装) [![License](https://img.shields.io/badge/License-GPL--3.0--only-blue)](LICENSE) [![弹幕](https://img.shields.io/badge/%E5%BC%B9%E5%B9%95-%E5%8F%AF%E6%8D%A2%E5%AD%97%E4%BD%93-F15A2B)](DISTRIBUTION.md)
 
@@ -27,7 +27,7 @@ Kotlin + Jetpack Compose + Media3 的原生 Android 客户端，请求、媒体�
 
 从本仓库的 [Releases](../../releases/latest) 下载最新 APK。Android **8.0 / API 26** 及以上。
 
-> 从 `0.7.33-dm24` 起内置两套中文字体（思源黑体、HarmonyOS Sans），APK 因此增大约 25 MB；字体许可与来源见 [第三方通知](THIRD_PARTY_NOTICES.md)。
+> 从 `0.7.33-dm25` 起内置四套中文字体（思源黑体 / 思源宋体 / 霞鹜文楷 / HarmonyOS Sans，前三套做过 GB2312 子集），字体许可与来源见 [第三方通知](THIRD_PARTY_NOTICES.md)。
 
 每个 Release 的说明都写明：对应的源码 tag、APK 的 SHA-256、包名与签名指纹。下载后可以这样核对：
 
@@ -50,7 +50,7 @@ sha256sum <下载到的文件>.apk
 
 ### 本分支实机截图
 
-模拟器 AVD `hg36`（Pixel 6 轮廓，Android 16，1080×2400）实测，`0.7.33-dm24`：
+模拟器 AVD `hg36`（Pixel 6 轮廓，Android 16，1080×2400）实测，`0.7.33-dm25`：
 
 <table>
   <tr>
@@ -65,7 +65,7 @@ sha256sum <下载到的文件>.apk
   </tr>
 </table>
 
-弹幕参数：屏幕占比 5 档（1/6 … 全屏）、字号 5 档、**字体 5 档（B站 = 内置思源黑体，默认；鸿蒙 = 内置 HarmonyOS Sans；系统 / 宋体 / 等宽用系统字体族）**、不透明度 4 档、文字效果（白字 / 黑边 / 阴影）、移动速度 5 档；跟随播放位置滚动，暂停即停、倍速同步；换字体、换字号时正在飞的弹幕不清空，按新字宽重新排轨道；换集/换剧/重启后沿用；画中画不显示；弹幕层在手势层之下，不影响单击显隐、双击暂停与横滑。
+弹幕参数：屏幕占比 5 档（1/6 … 全屏）、字号 5 档、**字体 4 档（黑体 = 内置思源黑体，默认；宋体 = 内置思源宋体；楷体 = 内置霞鹜文楷；鸿蒙 = 内置 HarmonyOS Sans）**、不透明度 4 档、文字效果（白字 / 黑边 / 阴影）、移动速度 5 档；跟随播放位置滚动，暂停即停、倍速同步；换字体、换字号时正在飞的弹幕不清空，按新字宽重新排轨道；换集/换剧/重启后沿用；画中画不显示；弹幕层在手势层之下，不影响单击显隐、双击暂停与横滑。
 
 <table>
   <tr>
@@ -96,7 +96,7 @@ sha256sum <下载到的文件>.apk
 
 | 功能 | 说明 |
 | --- | --- |
-| 弹幕 | 播放页右下角「弹」开关与设置入口：屏幕占比、字号、字体（B站 = 思源黑体 / 鸿蒙 = HarmonyOS Sans / 系统 / 宋体 / 等宽）、不透明度、文字效果、移动速度；跟随播放位置滚动，暂停即停、倍速同步，转屏后按已滚比例续锚 |
+| 弹幕 | 播放页右下角「弹」开关与设置入口：屏幕占比、字号、字体（黑体 = 思源黑体 / 宋体 = 思源宋体 / 楷体 = 霞鹜文楷 / 鸿蒙 = HarmonyOS Sans）、不透明度、文字效果、移动速度；跟随播放位置滚动，暂停即停、倍速同步，转屏后按已滚比例续锚 |
 | 首页与续看 | 本机最新观看记录一键续播；推荐（猜你喜欢，登录后按本人账号推荐）、热度、最新短剧和漫剧榜单，支持继续翻页；沉浸暗场上下滑动自动试看第 1 集 |
 | 发现与搜索 | 浏览短剧、漫剧、AI 剧，按上游提供的条件筛选；从首页或发现进入独立搜索页 |
 | 竖屏播放 | 上划下一集、下划上一集，也可打开选集面板跳转；竖屏保留状态栏，横屏为全屏 |
@@ -186,7 +186,7 @@ chmod +x gradlew
 ./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
 ```
 
-APK 产物：`app/build/outputs/apk/debug/HGMini-v0.7.33-dm24-debug.apk`（文件名带版本号，由 `appVersionName` 决定；版本号规则见 `app/build.gradle.kts` 顶部）。
+APK 产物：`app/build/outputs/apk/debug/HGMini-v0.7.33-dm25-debug.apk`（文件名带版本号，由 `appVersionName` 决定；版本号规则见 `app/build.gradle.kts` 顶部）。
 
 有 Android 设备或模拟器时，可运行设备测试：
 

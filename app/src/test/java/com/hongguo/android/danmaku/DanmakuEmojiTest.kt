@@ -104,28 +104,32 @@ class DanmakuPrefsTest {
         assertEquals(DanmakuPrefs.EFFECT_DEFAULT, DanmakuSettings().effect)
     }
 
-    @Test fun `typeface steps map to bundled fonts and system families`() {
-        // 默认档是随包内置的思源黑体（B站弹幕观感），不是系统字体。
-        assertEquals("B站", DanmakuPrefs.typefaceLabel(0))
+    @Test fun `typeface steps map to bundled fonts`() {
+        // 每一档都指向一个随包字体文件：早先直接用系统字体族名，
+        // 中文在 Android 上会被回退成同一个黑体，等于换了个寂寞。
+        assertEquals("黑体", DanmakuPrefs.typefaceLabel(0))
         assertEquals(DanmakuPrefs.TYPEFACE_DEFAULT, 0)
         assertEquals("fonts/SourceHanSansSC-Regular.otf", DanmakuPrefs.typefaceAsset(0))
-        assertNull(DanmakuPrefs.typefaceFamily(0))
-        assertEquals("鸿蒙", DanmakuPrefs.typefaceLabel(1))
-        assertEquals("fonts/HarmonyOS_Sans_SC_Regular.ttf", DanmakuPrefs.typefaceAsset(1))
-        assertNull(DanmakuPrefs.typefaceFamily(1))
-        // 系统档位不打包字体，只给字体族名。
-        assertEquals("系统", DanmakuPrefs.typefaceLabel(2))
-        assertNull(DanmakuPrefs.typefaceAsset(2))
-        assertNull(DanmakuPrefs.typefaceFamily(2))
-        assertEquals("宋体", DanmakuPrefs.typefaceLabel(3))
-        assertEquals("serif", DanmakuPrefs.typefaceFamily(3))
-        assertEquals("等宽", DanmakuPrefs.typefaceLabel(4))
-        assertEquals("monospace", DanmakuPrefs.typefaceFamily(4))
+        assertEquals("宋体", DanmakuPrefs.typefaceLabel(1))
+        assertEquals("fonts/SourceHanSerifSC-Regular.otf", DanmakuPrefs.typefaceAsset(1))
+        assertEquals("楷体", DanmakuPrefs.typefaceLabel(2))
+        assertEquals("fonts/LXGWWenKai-Regular.ttf", DanmakuPrefs.typefaceAsset(2))
+        assertEquals("鸿蒙", DanmakuPrefs.typefaceLabel(3))
+        assertEquals("fonts/HarmonyOS_Sans_SC_Regular.ttf", DanmakuPrefs.typefaceAsset(3))
         // 越界与负数都夹回两端，旧版本写入的任意整数不会让面板空选。
         assertEquals(DanmakuPrefs.TYPEFACE_LABELS.lastIndex, DanmakuPrefs.typeface(9))
         assertEquals(0, DanmakuPrefs.typeface(-3))
         assertEquals(DanmakuPrefs.TYPEFACE_LABELS.lastIndex, DanmakuSettings(typeface = 12).normalized().typeface)
         assertEquals(DanmakuPrefs.TYPEFACE_DEFAULT, DanmakuSettings().typeface)
+    }
+
+    @Test fun `dm24 typeface index maps onto the dm25 choices`() {
+        assertEquals(0, DanmakuPrefs.typefaceFromLegacy(0)) // B站（思源黑体）→ 黑体
+        assertEquals(3, DanmakuPrefs.typefaceFromLegacy(1)) // 鸿蒙 → 鸿蒙
+        assertEquals(0, DanmakuPrefs.typefaceFromLegacy(2)) // 系统 → 黑体
+        assertEquals(1, DanmakuPrefs.typefaceFromLegacy(3)) // 宋体 → 宋体
+        assertEquals(0, DanmakuPrefs.typefaceFromLegacy(4)) // 等宽 → 黑体
+        assertEquals(0, DanmakuPrefs.typefaceFromLegacy(99))
     }
 
     @Test fun `coverage steps map onto screen fractions`() {

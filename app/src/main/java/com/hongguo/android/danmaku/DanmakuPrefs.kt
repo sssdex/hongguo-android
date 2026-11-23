@@ -36,26 +36,26 @@ object DanmakuPrefs {
     private val FONT_SCALES = floatArrayOf(0.5f, 0.72f, 0.95f, 1.22f, 1.55f)
 
     /**
-     * 字体五档。前两档是随 APK 打包的字体文件，后三档用系统字体族：
+     * 字体五档，前四档都是随 APK 打包的字体文件（按 GB2312 + 常用标点做过子集，缺字由系统回退）：
      *
-     * - 「B站」= 思源黑体（Source Han Sans SC Regular，SIL OFL 1.1）。B站弹幕在 Android 上
-     *   就是这套现代黑体的观感，作为本应用的默认字体。
-     * - 「鸿蒙」= HarmonyOS Sans SC Regular（华为免费商用许可）。
-     * - 「系统」/「宋体」/「等宽」用系统内置字体族，不占包体。
+     * - 「黑体」= 思源黑体（Source Han Sans SC），默认档，B站弹幕在 Android 上的观感。
+     * - 「宋体」= 思源宋体（Source Han Serif SC），衬线字形，和黑体一眼可辨。
+     * - 「楷体」= 霞鹜文楷（LXGW WenKai），楷书笔形。
+     * - 「鸿蒙」= HarmonyOS Sans SC。
      *
-     * 内置字体缺字时由系统字体回退链补齐；字体文件缺失（例如精简构建）时回落到系统默认，
-     * 不会出现方块或崩溃。
+     * 四档全部内置字体文件、字形两两可辨。早先版本试过直接引用系统字体族名
+     * （serif / monospace）并把「系统」单列一档，实测 Android 会把中文回退到同一个
+     * 系统黑体，用户体感就是「换字体没变化」，所以不再提供「系统」档。
      */
-    val TYPEFACE_LABELS = listOf("B站", "鸿蒙", "系统", "宋体", "等宽")
+    val TYPEFACE_LABELS = listOf("黑体", "宋体", "楷体", "鸿蒙")
     const val TYPEFACE_DEFAULT = 0
-    /** assets 下的字体文件；null 表示这一档用系统字体族。 */
-    private val TYPEFACE_ASSETS = listOf<String?>(
+    /** assets 下的字体文件。 */
+    private val TYPEFACE_ASSETS = listOf(
         "fonts/SourceHanSansSC-Regular.otf",
+        "fonts/SourceHanSerifSC-Regular.otf",
+        "fonts/LXGWWenKai-Regular.ttf",
         "fonts/HarmonyOS_Sans_SC_Regular.ttf",
-        null, null, null,
     )
-    /** 系统字体族名；null 表示用 Paint 的默认字体。 */
-    private val TYPEFACE_FAMILIES = listOf<String?>(null, null, null, "serif", "monospace")
 
     /** 速度五档。最快的跨屏时间压到基准的 0.42 倍，最慢拉到 1.9 倍，档位之间不再挤在一起。 */
     val SPEED_LABELS = listOf("很慢", "慢", "标准", "快", "很快")
@@ -76,6 +76,14 @@ object DanmakuPrefs {
     fun opacityIndex(value: Int) = OPACITY_STEPS.indexOf(opacity(value)).coerceAtLeast(0)
     fun font(value: Int) = value.coerceIn(0, FONT_LABELS.lastIndex)
     fun typeface(value: Int) = value.coerceIn(0, TYPEFACE_LABELS.lastIndex)
+
+    /**
+     * 0.7.33-dm24 的档位是「B站/鸿蒙/系统/宋体/等宽」，dm25 换成「黑体/宋体/楷体/鸿蒙」。
+     * 旧值含义不同，读盘时按这张表搬一次，否则用户上次选的鸿蒙会变成宋体；
+     * 旧的「系统/等宽」都落到黑体（Android 上它们本来就渲染成同一个系统黑体）。
+     */
+    fun typefaceFromLegacy(value: Int): Int =
+        listOf(0, 3, 0, 1, 0).getOrNull(value) ?: TYPEFACE_DEFAULT
     fun speed(value: Int) = value.coerceIn(0, SPEED_LABELS.lastIndex)
     fun coverage(value: Int) = value.coerceIn(0, COVERAGE_LABELS.lastIndex)
 
@@ -93,14 +101,8 @@ object DanmakuPrefs {
     fun coverageFraction(value: Int) = COVERAGE_FRACTIONS[coverage(value)]
     fun fontLabel(value: Int) = FONT_LABELS[font(value)]
     fun typefaceLabel(value: Int) = TYPEFACE_LABELS[typeface(value)]
-    /** 当前档位对应的 assets 字体路径；null 表示不是内置字体。 */
-    fun typefaceAsset(value: Int): String? = TYPEFACE_ASSETS[typeface(value)]
-    /**
-     * 当前档位对应的系统字体族名；null 表示不改 Paint 的字体，沿用系统默认。
-     * 名称是 Android 的字体族约定（serif / monospace），缺字时由系统的字体回退链补齐，
-     * 不需要在这里判断字库是否存在。
-     */
-    fun typefaceFamily(value: Int): String? = TYPEFACE_FAMILIES[typeface(value)]
+    /** 当前档位对应的 assets 字体路径。 */
+    fun typefaceAsset(value: Int): String = TYPEFACE_ASSETS[typeface(value)]
     fun speedLabel(value: Int) = SPEED_LABELS[speed(value)]
     fun coverageLabel(value: Int) = COVERAGE_LABELS[coverage(value)]
     fun effectLabel(value: Int) = EFFECT_LABELS[effect(value)]

@@ -125,7 +125,11 @@ class HongguoViewModel(application: Application) : AndroidViewModel(application)
                     preferences.getInt("danmaku_coverage", DanmakuPrefs.COVERAGE_LEGACY_DEFAULT))
             },
             font = preferences.getInt("danmaku_font", DanmakuPrefs.FONT_DEFAULT),
-            typeface = preferences.getInt("danmaku_typeface", DanmakuPrefs.TYPEFACE_DEFAULT),
+            // dm25 起档位含义变了：旧键没搬过就先按 dm24 的下标映射一次，见 DanmakuPrefs.typefaceFromLegacy。
+            typeface = if (preferences.getBoolean("danmaku_typeface_v2", false))
+                preferences.getInt("danmaku_typeface", DanmakuPrefs.TYPEFACE_DEFAULT)
+            else DanmakuPrefs.typefaceFromLegacy(
+                preferences.getInt("danmaku_typeface", DanmakuPrefs.TYPEFACE_DEFAULT)),
             opacity = preferences.getInt("danmaku_opacity", DanmakuPrefs.OPACITY_DEFAULT),
             effect = preferences.getInt("danmaku_effect", DanmakuPrefs.EFFECT_DEFAULT),
             speed = preferences.getInt("danmaku_speed", DanmakuPrefs.SPEED_DEFAULT),
@@ -484,6 +488,7 @@ class HongguoViewModel(application: Application) : AndroidViewModel(application)
             putInt("danmaku_coverage_permille", DanmakuPrefs.coveragePermille(next.coverage))
             putInt("danmaku_font", next.font)
             putInt("danmaku_typeface", next.typeface)
+            putBoolean("danmaku_typeface_v2", true)
             putInt("danmaku_opacity", next.opacity)
             putInt("danmaku_effect", next.effect)
             putInt("danmaku_speed", next.speed)

@@ -71,7 +71,9 @@ internal class DanmakuView(context: Context, textSizeSp: Float = 18f, crossMs: L
     }
     private var effect = DanmakuPrefs.EFFECT_DEFAULT
     /** 已应用的字体档位与解析结果，用来避免每次重组都重建 Typeface、重排屏上弹幕。 */
-    private var typefaceIndex = DanmakuPrefs.TYPEFACE_DEFAULT
+    // -1 表示还没应用过：默认档本身就是 0，如果也用 0 初始化，首次 applyPrefs 会认为
+    // 「没变」而跳过解析，默认字体就永远不生效。
+    private var typefaceIndex = -1
     private var resolvedTypeface: Typeface = Typeface.DEFAULT
 
     init {
@@ -350,15 +352,11 @@ internal class DanmakuView(context: Context, textSizeSp: Float = 18f, crossMs: L
      */
     private fun resolveTypeface(index: Int): Typeface {
         val asset = DanmakuPrefs.typefaceAsset(index)
-        if (asset != null) {
-            return assetTypefaces.getOrPut(asset) {
-                runCatching { Typeface.createFromAsset(context.assets, asset) }
-                    .onFailure { Log.w("Danmaku", "字体缺失 $asset，回落到系统默认", it) }
-                    .getOrDefault(Typeface.DEFAULT)
-            }
+        return assetTypefaces.getOrPut(asset) {
+            runCatching { Typeface.createFromAsset(context.assets, asset) }
+                .onFailure { Log.w("Danmaku", "字体缺失 $asset，回落到系统默认", it) }
+                .getOrDefault(Typeface.DEFAULT)
         }
-        return DanmakuPrefs.typefaceFamily(index)?.let { Typeface.create(it, Typeface.NORMAL) }
-            ?: Typeface.DEFAULT
     }
 
     companion object {

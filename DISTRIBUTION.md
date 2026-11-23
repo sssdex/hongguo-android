@@ -26,8 +26,8 @@
 | 应用名（桌面/我的） | 红果独立版 / 红果剧场 | 弹幕剧场 | 不使用他人商标作为应用标识 |
 | 启动图标与页头标记 | 上游品牌素材 | 自绘「对话气泡 + 播放键」矢量 | 同上；未复制任何上游美术素材 |
 | 在线更新源 | 固定指向上游仓库 | 由 `-PupdateRepository=<owner>/<repo>` 指定，默认不绑定 | 否则会提示一个签名不符、装不上的「新版」 |
-| 弹幕 | 自 0.7.32 起内置官方弹幕 | 官方弹幕 + **字体切换**（B站 = 内置思源黑体，默认；鸿蒙 = 内置 HarmonyOS Sans；系统 / 宋体 / 等宽） | 本分支的存在理由 |
-| 内置字体 | 无 | 思源黑体（OFL 1.1）+ HarmonyOS Sans（华为字体许可），均未修改字形，许可全文在 `assets/licenses/` | 字体许可要求显著声明，见 `THIRD_PARTY_NOTICES.md` |
+| 弹幕 | 自 0.7.32 起内置官方弹幕 | 官方弹幕 + **字体切换**（黑体 = 内置思源黑体，默认；宋体 = 思源宋体；楷体 = 霞鹜文楷；鸿蒙 = HarmonyOS Sans），四档两两可辨 | 本分支的存在理由 |
+| 内置字体 | 无 | 思源黑体 / 思源宋体 / 霞鹜文楷（OFL 1.1，子集；楷体子集按保留字体名条款改名为 Tanmu Kai）+ HarmonyOS Sans（华为许可，原文件未改），许可全文在 `assets/licenses/` | 字体许可要求显著声明，见 `THIRD_PARTY_NOTICES.md` |
 
 `namespace`、包内所有 `com.hongguo.android.*` 的类名和接口协议**都没有改**，只有 `applicationId` 变了。这是刻意的：改动面越小，越容易让别人复核这份代码。
 
@@ -52,7 +52,7 @@
 
 本项目整体是 GPL-3.0-only。**分发 APK 就等于分发目标代码，必须同时提供对应源码。**
 
-- 源码就是本仓库。发布时给每个版本打 tag（如 `v0.7.33-dm24`），Release 说明里写明「对应源码：tag `v0.7.33-dm24`」，或直接把 `source.zip` 传成附件。
+- 源码就是本仓库。发布时给每个版本打 tag（如 `v0.7.33-dm25`），Release 说明里写明「对应源码：tag `v0.7.33-dm25`」，或直接把 `source.zip` 传成附件。
 - 保留 `LICENSE`、`THIRD_PARTY_NOTICES.md`、`app/src/main/assets/licenses/` 下的全部许可文本，不要删。
 - 修改过的文件要在提交记录里说明改了哪里（见第 2 节表格），这是 GPL §5 对「标记修改」的要求。
 - 不得对 GPL 代码附加额外限制（不能加「禁止商用」「禁止再分发」之类的条款）。
@@ -70,17 +70,17 @@ printf 'sdk.dir=D:/android-build/sdk\n' > local.properties      # 不要提交�
   -PupdateRepository=<你的账号>/<仓库名>
 
 # 2) 核对（四项版本信息 + 签名 + 弹幕类真的进了 dex）
-apksigner verify --print-certs app/build/outputs/apk/debug/HGMini-v0.7.33-dm24-debug.apk
-aapt2 dump badging app/build/outputs/apk/debug/HGMini-v0.7.33-dm24-debug.apk | head -3
-apkanalyzer dex packages app/build/outputs/apk/debug/HGMini-v0.7.33-dm24-debug.apk | grep danmaku
+apksigner verify --print-certs app/build/outputs/apk/debug/HGMini-v0.7.33-dm25-debug.apk
+aapt2 dump badging app/build/outputs/apk/debug/HGMini-v0.7.33-dm25-debug.apk | head -3
+apkanalyzer dex packages app/build/outputs/apk/debug/HGMini-v0.7.33-dm25-debug.apk | grep danmaku
 
 # 3) 出哈希
-sha256sum app/build/outputs/apk/debug/HGMini-v0.7.33-dm24-debug.apk
+sha256sum app/build/outputs/apk/debug/HGMini-v0.7.33-dm25-debug.apk
 ```
 
 发布检查单：
 
-- [ ] tag 与 `versionName` 一致（`v0.7.33-dm24` ↔ `0.7.33-dm24`），`versionCode` 严格递增（73324）
+- [ ] tag 与 `versionName` 一致（`v0.7.33-dm25` ↔ `0.7.33-dm25`），`versionCode` 严格递增（73324）
 - [ ] Release 说明写明：对应源码 tag、APK 的 SHA-256、包名、minSdk、签名指纹、本次改动
 - [ ] 若指定了 `updateRepository`，把 `update.json` 一起传到 Release（`latest/download/update.json` 路径要能取到），否则应用内更新会失败
 - [ ] 若没指定 `updateRepository`，Release 说明里写「本包未绑定更新源，请手动下载新版」
