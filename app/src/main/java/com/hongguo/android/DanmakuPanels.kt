@@ -90,6 +90,9 @@ internal fun DanmakuSettingsPanel(
         DanmakuChoiceRow("字体大小", DanmakuPrefs.FONT_LABELS, settings.font, settings.enabled) {
             onChange(settings.copy(font = it))
         }
+        DanmakuChoiceRow("字体", DanmakuPrefs.TYPEFACE_LABELS, settings.typeface, settings.enabled) {
+            onChange(settings.copy(typeface = it))
+        }
         // 存的是百分比，按钮按下标排，这里把两者对上，才不会出现「一格都不亮」的情况。
         DanmakuChoiceRow("不透明度", DanmakuPrefs.OPACITY_LABELS, DanmakuPrefs.opacityIndex(settings.opacity),
             settings.enabled) {

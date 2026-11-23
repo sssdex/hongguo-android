@@ -125,6 +125,7 @@ class HongguoViewModel(application: Application) : AndroidViewModel(application)
                     preferences.getInt("danmaku_coverage", DanmakuPrefs.COVERAGE_LEGACY_DEFAULT))
             },
             font = preferences.getInt("danmaku_font", DanmakuPrefs.FONT_DEFAULT),
+            typeface = preferences.getInt("danmaku_typeface", DanmakuPrefs.TYPEFACE_DEFAULT),
             opacity = preferences.getInt("danmaku_opacity", DanmakuPrefs.OPACITY_DEFAULT),
             effect = preferences.getInt("danmaku_effect", DanmakuPrefs.EFFECT_DEFAULT),
             speed = preferences.getInt("danmaku_speed", DanmakuPrefs.SPEED_DEFAULT),
@@ -482,6 +483,7 @@ class HongguoViewModel(application: Application) : AndroidViewModel(application)
             putBoolean("danmaku_enabled", next.enabled)
             putInt("danmaku_coverage_permille", DanmakuPrefs.coveragePermille(next.coverage))
             putInt("danmaku_font", next.font)
+            putInt("danmaku_typeface", next.typeface)
             putInt("danmaku_opacity", next.opacity)
             putInt("danmaku_effect", next.effect)
             putInt("danmaku_speed", next.speed)

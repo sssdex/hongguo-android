@@ -189,3 +189,18 @@ Playback v5 model endpoint (2026-11-16)
 
 `namespace`、包内类名与接口协议均未改动。除上述内容外，弹幕实现与上游分支逐字一致。
 
+
+## 内置字体（dist 分支新增）
+
+本分支额外打包了两套中文字体，只用于弹幕渲染，字形均未修改：
+
+- **思源黑体 / Source Han Sans SC Regular**（`app/src/main/assets/fonts/SourceHanSansSC-Regular.otf`）
+  - 来源：adobe-fonts/source-han-sans，Release `2.005R` 的 `09_SourceHanSansSC.zip` 内 `OTF/SimplifiedChinese/SourceHanSansSC-Regular.otf`。
+    https://github.com/adobe-fonts/source-han-sans
+  - 许可：SIL Open Font License 1.1，全文见 `app/src/main/assets/licenses/SourceHanSans-OFL.txt`。
+- **HarmonyOS Sans SC Regular**（`app/src/main/assets/fonts/HarmonyOS_Sans_SC_Regular.ttf`）
+  - 来源：Huawei Device Co., Ltd. 发布的 HarmonyOS Sans 字体；本仓库使用的是镜像 iota9star/fonts Release 中的同名文件。
+    https://github.com/iota9star/fonts/releases
+  - 许可：HarmonyOS Sans Fonts License Agreement（允许随软件捆绑、再分发未修改副本，要求显著声明使用）。全文见 `app/src/main/assets/licenses/HarmonyOS-Sans-LICENSE.txt`。
+
+弹幕的「B站」档即思源黑体。B站官方客户端在 Android 上用系统黑体渲染弹幕，本应用内置思源黑体是为了在各机型上得到一致的现代黑体观感，**没有使用 B站 的任何字体文件或美术素材**。

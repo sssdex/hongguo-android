@@ -6,7 +6,9 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.os.SystemClock
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 
@@ -68,6 +70,9 @@ internal class DanmakuView(context: Context, textSizeSp: Float = 18f, crossMs: L
         strokeJoin = Paint.Join.ROUND
     }
     private var effect = DanmakuPrefs.EFFECT_DEFAULT
+    /** 已应用的字体档位与解析结果，用来避免每次重组都重建 Typeface、重排屏上弹幕。 */
+    private var typefaceIndex = DanmakuPrefs.TYPEFACE_DEFAULT
+    private var resolvedTypeface: Typeface = Typeface.DEFAULT
 
     init {
         isFocusable = false
@@ -75,17 +80,27 @@ internal class DanmakuView(context: Context, textSizeSp: Float = 18f, crossMs: L
     }
 
     /**
-     * Applies the user's rendering preferences. A font-size change keeps the comments already
-     * flying: their text is measured again at the new size, each one keeps its share of the
-     * crossing, and they are re-seated into tracks. Opacity and speed apply to what is already
-     * flying. The row count is never set from outside: [relayout] derives it from the band height
-     * and the current font, so the coverage fraction chosen by the user translates into real rows.
+     * Applies the user's rendering preferences. A font-size or font-face change keeps the comments
+     * already flying: their text is measured again, each one keeps its share of the crossing, and
+     * they are re-seated into tracks. Opacity and speed apply to what is already flying. The row
+     * count is never set from outside: [relayout] derives it from the band height and the current
+     * font, so the coverage fraction chosen by the user translates into real rows.
      */
-    fun applyPrefs(opacityPct: Int, font: Int, speed: Int, effect: Int) {
+    fun applyPrefs(opacityPct: Int, font: Int, typeface: Int, speed: Int, effect: Int) {
         val oldTextSize = paint.textSize
+        val oldTypefaceIndex = typefaceIndex
         val alpha = DanmakuPrefs.opacity(opacityPct) * 255 / 100
         paint.alpha = alpha
         paint.textSize = baseTextSize * DanmakuPrefs.fontScale(font)
+        // 字体只在档位真的变了时才去解析：Typeface.create 每次都会给出新对象，拿对象判等会让
+        // 每次重组都重排一遍屏上弹幕。缺字由系统字体回退链补齐，这里不预判字库是否存在。
+        val nextTypefaceIndex = DanmakuPrefs.typeface(typeface)
+        if (nextTypefaceIndex != typefaceIndex) {
+            typefaceIndex = nextTypefaceIndex
+            resolvedTypeface = resolveTypeface(nextTypefaceIndex)
+            paint.typeface = resolvedTypeface
+            outlinePaint.typeface = resolvedTypeface
+        }
         this.effect = DanmakuPrefs.effect(effect)
         // 黑边 and 阴影 both need something behind the glyphs; the shadow carries its own colour, and
         // paint.alpha never touches it, so a 25% comment would turn into a grey blob under an opaque
@@ -101,8 +116,8 @@ internal class DanmakuView(context: Context, textSizeSp: Float = 18f, crossMs: L
         outlinePaint.strokeWidth = (paint.textSize / 14f).coerceAtLeast(1f)
         currentCrossMs = (baseCrossMs * DanmakuPrefs.speedScale(speed)).toLong().coerceAtLeast(1)
         relayout()
-        if (paint.textSize != oldTextSize) {
-            // 字号只是把字放大缩小，不该把正在飞的弹幕清空：按新字号重新量一遍宽度，
+        if (paint.textSize != oldTextSize || typefaceIndex != oldTypefaceIndex) {
+            // 字号或字体只是改变字形占的宽度，不该把正在飞的弹幕清空：按新参数重新量一遍宽度，
             // 保持各自跨屏进度不变，再重新分配轨道，实在排不下的那几条才丢掉。
             reseat(positionProvider().coerceAtLeast(0), remeasure = true)
         }
@@ -328,10 +343,30 @@ internal class DanmakuView(context: Context, textSizeSp: Float = 18f, crossMs: L
         }
     }
 
+    /**
+     * 解析字体档位：内置字体走 assets，首次加载后按路径缓存——两个字体文件加起来约 24 MB，
+     * 不能每次进播放页都重新解析。系统档位走字体族名；字体文件缺失或损坏时回落到系统默认，
+     * 保证精简构建或坏包也不会让弹幕整层失效。
+     */
+    private fun resolveTypeface(index: Int): Typeface {
+        val asset = DanmakuPrefs.typefaceAsset(index)
+        if (asset != null) {
+            return assetTypefaces.getOrPut(asset) {
+                runCatching { Typeface.createFromAsset(context.assets, asset) }
+                    .onFailure { Log.w("Danmaku", "字体缺失 $asset，回落到系统默认", it) }
+                    .getOrDefault(Typeface.DEFAULT)
+            }
+        }
+        return DanmakuPrefs.typefaceFamily(index)?.let { Typeface.create(it, Typeface.NORMAL) }
+            ?: Typeface.DEFAULT
+    }
+
     companion object {
         private const val SEEK_TOLERANCE_MS = 250L
         private const val SEEK_FORWARD_MS = 1_000L
         /** 行距相对字高的倍数；行数用带高除以它之后四舍五入。 */
         private const val ROW_PITCH = 1.12f
+        /** 内置字体按 assets 路径缓存，跨播放页、跨剧共用。 */
+        private val assetTypefaces = HashMap<String, Typeface>()
     }
 }

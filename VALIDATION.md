@@ -1,3 +1,18 @@
+# 0.7.33-dm24 / versionCode 73324（2026-11-23，dist 分支第二次分发构建）
+
+合并上游 v0.7.33（含 0.7.32 的取源修复），并在弹幕设置里新增字体切换。相对上游的差异仍是分发配置 + 字体，没有改动弹幕算法与取源逻辑（逐项见 `DISTRIBUTION.md`）。
+
+- 取源修复：2026-11-20 起 `player/v1` 的 v5 POST 与旧的签名 `video_tab` GET 都只回 HTTP 200 + 空正文，所有旧路径得到 `EMPTY_RESPONSE`；0.7.32 起先把 `video_tab` 按 v5 签名、以无正文 GET 请求（只带 `x-khronos` / `x-helios` / `x-medusa`），旧路径保留为回退。用户侧 11-23 上午报的「播放服务连续返回空响应」即此问题，dm23 之前的包全部受影响。
+- 字体：新增「字体」一档，五档 = B站（内置思源黑体 Source Han Sans SC，默认）/ 鸿蒙（内置 HarmonyOS Sans SC）/ 系统 / 宋体 / 等宽。字体按 assets 路径缓存，切换时正在滚的弹幕按新字宽重排轨道、不清屏；选择写入 `danmaku_typeface` 并在重启后沿用。内置字体缺字回退系统字体，字体文件缺失回退系统默认。
+- 应用内更新：`UpdateManifestCodec` 的 `applicationId` 由硬编码 `com.hongguo.android` 改为 `BuildConfig.APPLICATION_ID`（本包为 `com.hongguo.android.dm`），否则本仓库发出的 `update.json` 会一律 `UPDATE_APPLICATION_MISMATCH`。
+- 构建：`:app:assembleDebug -PappDanmakuBuild=24 -PupdateRepository=sssdex/tanmu-juchang` → BUILD SUCCESSFUL。APK 48,593,876 字节，SHA-256 `9f81d28133a864278c8a96e26dc7c9ce7ae2e813ce0547661a6f42ba6bce05c4`（字体使包体比 dm23 增大约 22 MB）。
+- 静态核对：package `com.hongguo.android.dm`、versionName `0.7.33-dm24`、versionCode `73324`、minSdk 26、targetSdk 36；`apkanalyzer dex packages` 中 `com.hongguo.android.danmaku.*` 有 625 处引用；`apksigner` 证书 SHA-256 `a230559b…`，与 dm23 同一条签名链。
+- 443 项 JVM 测试通过，0 失败、0 错误、0 跳过（新增字体档位映射与越界夹取用例；更新清单测试改用 `BuildConfig.APPLICATION_ID`）。
+- 模拟器 AVD `hg36`（Pixel 6 轮廓，Android 16，x86_64，1080×2400，无头 + `screencap`）：从 dm23（73324 之前版本号 73123）`adb install -r` 覆盖安装成功，收藏、历史、续播位置保留。
+- 业务验收（真实上游接口、未登录）：首页与继续观看正常；《装穷提亲》第 1 集播放至 01:46 / 02:48，弹幕密集；上划切到第 3 集继续播放（00:09 / 02:28）；弹幕设置面板出现「字体」行，B站 / 鸿蒙 / 系统 / 宋体 / 等宽可即时切换，切换时屏上弹幕不清空、按新字宽重排；`shared_prefs/hongguo_local.xml` 中 `danmaku_typeface=0` 落盘，杀进程重启后沿用。
+- 已知：首次进入播放页解析 16.5 MB 内置字体时有约 0.5 s 主线程停顿（logcat 出现 `Skipped 33 frames`），仅进程内首次；另观察到一次「准备播放失败，请检查网络后重试」，重试即恢复，判断为取源冷启动/网络抖动，与 0.7.31 的空响应错误文案不同（后者已修复）。
+- 未验证：真机、横屏与画中画、账号登录全流程、Android 8–15 设备；宋体档在缺少 Noto Serif CJK 的机型上会回退为系统黑体（模拟器上即为如此），属预期。
+
 # 0.7.31-dm23 / versionCode 73123（2026-11-21，dist 分支首次分发构建）
 
 相对 `feature/danmaku` 只改了分发相关配置（包名、应用名、图标、更新源），**弹幕实现逐字未改**；逐项差异见 `DISTRIBUTION.md` 与 `THIRD_PARTY_NOTICES.md`。

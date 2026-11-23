@@ -2,6 +2,7 @@
 package com.hongguo.android.danmaku
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class DanmakuEmojiTest {
@@ -101,6 +102,30 @@ class DanmakuPrefsTest {
         assertEquals("阴影", DanmakuPrefs.effectLabel(9))
         assertEquals(DanmakuPrefs.EFFECT_LABELS.lastIndex, DanmakuSettings(effect = 12).normalized().effect)
         assertEquals(DanmakuPrefs.EFFECT_DEFAULT, DanmakuSettings().effect)
+    }
+
+    @Test fun `typeface steps map to bundled fonts and system families`() {
+        // 默认档是随包内置的思源黑体（B站弹幕观感），不是系统字体。
+        assertEquals("B站", DanmakuPrefs.typefaceLabel(0))
+        assertEquals(DanmakuPrefs.TYPEFACE_DEFAULT, 0)
+        assertEquals("fonts/SourceHanSansSC-Regular.otf", DanmakuPrefs.typefaceAsset(0))
+        assertNull(DanmakuPrefs.typefaceFamily(0))
+        assertEquals("鸿蒙", DanmakuPrefs.typefaceLabel(1))
+        assertEquals("fonts/HarmonyOS_Sans_SC_Regular.ttf", DanmakuPrefs.typefaceAsset(1))
+        assertNull(DanmakuPrefs.typefaceFamily(1))
+        // 系统档位不打包字体，只给字体族名。
+        assertEquals("系统", DanmakuPrefs.typefaceLabel(2))
+        assertNull(DanmakuPrefs.typefaceAsset(2))
+        assertNull(DanmakuPrefs.typefaceFamily(2))
+        assertEquals("宋体", DanmakuPrefs.typefaceLabel(3))
+        assertEquals("serif", DanmakuPrefs.typefaceFamily(3))
+        assertEquals("等宽", DanmakuPrefs.typefaceLabel(4))
+        assertEquals("monospace", DanmakuPrefs.typefaceFamily(4))
+        // 越界与负数都夹回两端，旧版本写入的任意整数不会让面板空选。
+        assertEquals(DanmakuPrefs.TYPEFACE_LABELS.lastIndex, DanmakuPrefs.typeface(9))
+        assertEquals(0, DanmakuPrefs.typeface(-3))
+        assertEquals(DanmakuPrefs.TYPEFACE_LABELS.lastIndex, DanmakuSettings(typeface = 12).normalized().typeface)
+        assertEquals(DanmakuPrefs.TYPEFACE_DEFAULT, DanmakuSettings().typeface)
     }
 
     @Test fun `coverage steps map onto screen fractions`() {

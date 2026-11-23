@@ -26,7 +26,11 @@ data class AppUpdate(
 object UpdateManifestCodec {
     const val MAX_MANIFEST_BYTES = 128 * 1024
     const val MAX_APK_BYTES = 150L * 1024 * 1024
-    private const val APPLICATION_ID = "com.hongguo.android"
+    /**
+     * 应用 ID 跟随构建配置：dist 分支的包名是 `com.hongguo.android.dm`，硬编码上游包名会让
+     * 本仓库发出的更新清单被判成 `UPDATE_APPLICATION_MISMATCH`，更新永远装不上。
+     */
+    private const val APPLICATION_ID = BuildConfig.APPLICATION_ID
 
     fun parse(json: String, expectedRepository: String): AppUpdate {
         val repository = validatedRepository(expectedRepository)

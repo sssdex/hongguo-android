@@ -4,7 +4,7 @@ package com.hongguo.android.danmaku
 import kotlin.math.abs
 
 /**
- * 弹幕的显示参数。除了开关，用户只调四件事：占据屏幕多少高度、字号、透明度、滚动速度。
+ * 弹幕的显示参数。除了开关，用户调五件事：占据屏幕多少高度、字号、字体、透明度、滚动速度。
  * 具体的行数不再单独设置——弹幕层按屏占比拿到高度后，自己用「层高 ÷ 当前字号的行高」
  * 算出能排几行，所以同一个屏占比下，字越大行越少，字越小行越多。
  */
@@ -35,6 +35,28 @@ object DanmakuPrefs {
     const val FONT_DEFAULT = 2
     private val FONT_SCALES = floatArrayOf(0.5f, 0.72f, 0.95f, 1.22f, 1.55f)
 
+    /**
+     * 字体五档。前两档是随 APK 打包的字体文件，后三档用系统字体族：
+     *
+     * - 「B站」= 思源黑体（Source Han Sans SC Regular，SIL OFL 1.1）。B站弹幕在 Android 上
+     *   就是这套现代黑体的观感，作为本应用的默认字体。
+     * - 「鸿蒙」= HarmonyOS Sans SC Regular（华为免费商用许可）。
+     * - 「系统」/「宋体」/「等宽」用系统内置字体族，不占包体。
+     *
+     * 内置字体缺字时由系统字体回退链补齐；字体文件缺失（例如精简构建）时回落到系统默认，
+     * 不会出现方块或崩溃。
+     */
+    val TYPEFACE_LABELS = listOf("B站", "鸿蒙", "系统", "宋体", "等宽")
+    const val TYPEFACE_DEFAULT = 0
+    /** assets 下的字体文件；null 表示这一档用系统字体族。 */
+    private val TYPEFACE_ASSETS = listOf<String?>(
+        "fonts/SourceHanSansSC-Regular.otf",
+        "fonts/HarmonyOS_Sans_SC_Regular.ttf",
+        null, null, null,
+    )
+    /** 系统字体族名；null 表示用 Paint 的默认字体。 */
+    private val TYPEFACE_FAMILIES = listOf<String?>(null, null, null, "serif", "monospace")
+
     /** 速度五档。最快的跨屏时间压到基准的 0.42 倍，最慢拉到 1.9 倍，档位之间不再挤在一起。 */
     val SPEED_LABELS = listOf("很慢", "慢", "标准", "快", "很快")
     const val SPEED_DEFAULT = 2
@@ -53,6 +75,7 @@ object DanmakuPrefs {
     /** 透明度落在第几个候选按钮上；面板靠它决定哪一格高亮，别拿百分比直接比下标。 */
     fun opacityIndex(value: Int) = OPACITY_STEPS.indexOf(opacity(value)).coerceAtLeast(0)
     fun font(value: Int) = value.coerceIn(0, FONT_LABELS.lastIndex)
+    fun typeface(value: Int) = value.coerceIn(0, TYPEFACE_LABELS.lastIndex)
     fun speed(value: Int) = value.coerceIn(0, SPEED_LABELS.lastIndex)
     fun coverage(value: Int) = value.coerceIn(0, COVERAGE_LABELS.lastIndex)
 
@@ -69,6 +92,15 @@ object DanmakuPrefs {
 
     fun coverageFraction(value: Int) = COVERAGE_FRACTIONS[coverage(value)]
     fun fontLabel(value: Int) = FONT_LABELS[font(value)]
+    fun typefaceLabel(value: Int) = TYPEFACE_LABELS[typeface(value)]
+    /** 当前档位对应的 assets 字体路径；null 表示不是内置字体。 */
+    fun typefaceAsset(value: Int): String? = TYPEFACE_ASSETS[typeface(value)]
+    /**
+     * 当前档位对应的系统字体族名；null 表示不改 Paint 的字体，沿用系统默认。
+     * 名称是 Android 的字体族约定（serif / monospace），缺字时由系统的字体回退链补齐，
+     * 不需要在这里判断字库是否存在。
+     */
+    fun typefaceFamily(value: Int): String? = TYPEFACE_FAMILIES[typeface(value)]
     fun speedLabel(value: Int) = SPEED_LABELS[speed(value)]
     fun coverageLabel(value: Int) = COVERAGE_LABELS[coverage(value)]
     fun effectLabel(value: Int) = EFFECT_LABELS[effect(value)]
@@ -86,6 +118,7 @@ data class DanmakuSettings(
     val enabled: Boolean = true,
     val coverage: Int = DanmakuPrefs.COVERAGE_DEFAULT,
     val font: Int = DanmakuPrefs.FONT_DEFAULT,
+    val typeface: Int = DanmakuPrefs.TYPEFACE_DEFAULT,
     val opacity: Int = DanmakuPrefs.OPACITY_DEFAULT,
     val effect: Int = DanmakuPrefs.EFFECT_DEFAULT,
     val speed: Int = DanmakuPrefs.SPEED_DEFAULT,
@@ -94,6 +127,7 @@ data class DanmakuSettings(
     fun normalized() = copy(
         coverage = DanmakuPrefs.coverage(coverage),
         font = DanmakuPrefs.font(font),
+        typeface = DanmakuPrefs.typeface(typeface),
         opacity = DanmakuPrefs.opacity(opacity),
         effect = DanmakuPrefs.effect(effect),
         speed = DanmakuPrefs.speed(speed),
