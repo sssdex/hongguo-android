@@ -51,7 +51,7 @@ try {
         sha256 = (Get-FileHash -LiteralPath (Join-Path $output $apkName) -Algorithm SHA256).Hash.ToLowerInvariant()
         sizeBytes = (Get-Item -LiteralPath (Join-Path $output $apkName)).Length
         minSdk = $minimum
-        notes = '修复起播和切集时的间歇性空响应。客户端会在同一会话重查当前集一次，读取播放信息时若临时断线，可在原超时预算内重连。服务器要求稍后再试时会停止本次取流。'
+        notes = '新增详情页演员表：展示演员头像、姓名与饰演角色，点按演员可查看简介。优化长按 2× 加速播放：画面顶部显示提示，松手自动恢复原速。修复账号片单里剧集名称与海报缺失、显示占位条目的问题；观看进度与时间仍取最新记录。'
         publishedAt = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ssZ')
     }
     $utf8 = New-Object System.Text.UTF8Encoding($false)

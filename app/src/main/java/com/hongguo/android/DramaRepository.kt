@@ -31,12 +31,23 @@ data class DramaCard(
 
 data class Episode(val id: String, val index: Int, val title: String)
 
+/** One entry of the detail payload's celebrities list; upstream may omit any field. */
+data class CastMember(
+    val id: String,
+    val name: String,
+    val role: String,
+    val avatar: String,
+    val intro: String,
+)
+
 data class DramaDetail(
     val id: String,
     val title: String,
     val cover: String,
     val summary: String,
     val episodes: List<Episode>,
+    /** Empty when the platform returns no cast data; the detail page hides the section then. */
+    val cast: List<CastMember> = emptyList(),
 )
 
 data class DramaPage(val items: List<DramaCard>, val hasMore: Boolean, val nextOffset: Int)
@@ -126,14 +137,32 @@ class DramaRepository {
             Episode(id, Json.optInt(item["index"], 0), Json.optStr(item["title"], ""))
         }.sortedBy { it.index }
         if (episodes.isEmpty()) throw IOException("EMPTY_EPISODES")
+        // Client normalizes celebrity rows to Chinese keys (演员/角色/头像/简介); upstream rows
+        // carry the English names, so both spellings are accepted here.
+        val cast = Json.optArr(meta["celebrities"]).mapNotNull { raw ->
+            val item = Json.optObj(raw) ?: return@mapNotNull null
+            val name = Json.optStr(item["nickname"], "").ifBlank { Json.optStr(item["演员"], "") }.trim()
+            if (name.isBlank()) return@mapNotNull null
+            CastMember(
+                id = Json.optStr(item["celebrity_id"], name),
+                name = name,
+                role = Json.optStr(item["role_name"], "").ifBlank { Json.optStr(item["角色"], "") }.trim(),
+                avatar = cleanUrl(Json.optStr(item["avatar"], "").ifBlank { Json.optStr(item["头像"], "") }),
+                intro = Json.optStr(item["intro"], "").ifBlank { Json.optStr(item["简介"], "") }.replace(Regex("<[^>]+>"), "").trim(),
+            )
+        }
         DramaDetail(
             id = card.id,
             title = Json.optStr(meta["title"], card.title),
             cover = Json.optStr(meta["cover"], card.cover),
             summary = Json.optStr(meta["abstract"], card.summary),
             episodes = episodes,
+            cast = cast,
         )
     }
+
+    /** Detail payloads escape separators; covers keep working after unescaping them. */
+    private fun cleanUrl(value: String) = value.replace("\\/", "/").replace("\\u002F", "/").replace("&amp;", "&")
 
     suspend fun prepare(episode: Episode, allowFallback: Boolean = true,
                         progress: (String, Long, Long) -> Unit): PreparedVideo {
